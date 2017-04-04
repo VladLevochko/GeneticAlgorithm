@@ -2,6 +2,7 @@ package ua.vlad.artificialintellijence.model.individual;
 
 import org.junit.Test;
 import ua.vlad.artificialintellijence.model.gen.Gen;
+import ua.vlad.artificialintellijence.model.strategies.mutation.TraversalSalesmanMutation;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ public class IndividualsFabricTest {
         for (int i = 0; i < GENS_NUMBER; i++) {
             chromosome.add(new Gen(i));
         }
-        individual = new Individual(chromosome, l -> 0);
+        individual = new Individual(chromosome, l -> 0, new TraversalSalesmanMutation());
     }
 
     @Test

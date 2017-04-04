@@ -1,14 +1,15 @@
 package ua.vlad.artificialintellijence.model.population;
 
+import ua.vlad.artificialintellijence.model.Pair;
 import ua.vlad.artificialintellijence.model.individual.Individual;
 import ua.vlad.artificialintellijence.model.individual.IndividualsFabric;
 import ua.vlad.artificialintellijence.model.strategies.crossover.CrossoverException;
 import ua.vlad.artificialintellijence.model.strategies.crossover.CrossoverStrategy;
 import ua.vlad.artificialintellijence.model.strategies.selection.SelectionStrategy;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 
 /**
  * Created by vlad on 11.03.17.
@@ -16,7 +17,7 @@ import java.util.PriorityQueue;
 public class Population {
 
     private PopulationParameters parameters;
-    private PriorityQueue<Individual> population;
+    private List<Individual> population;
     private CrossoverStrategy crossoverStrategy;
     private SelectionStrategy selectionStrategy;
     private int fitness;
@@ -71,22 +72,22 @@ public class Population {
     }
 
     private void generatePopulation(Individual initialIndividual) {
-        List<Individual> individuals = IndividualsFabric.generateIndividuals(
+        population = IndividualsFabric.generateIndividuals(
                 initialIndividual, parameters.getPopulationSize());
-
-        population = new PriorityQueue<>(
-                Comparator.comparingDouble(Individual::getFitness).reversed());
-        population.addAll(individuals);
+        sortPopulation();
     }
 
-    public PriorityQueue<Individual> getIndividuals() {
-        PriorityQueue<Individual> individuals = new PriorityQueue<>(
-                Comparator.comparingDouble(Individual::getFitness));
+    public List<Individual> getIndividuals() {
+        List<Individual> individuals = new ArrayList<>();
         for (Individual individual : population) {
             individuals.add(individual.copy());
         }
 
         return individuals;
+    }
+
+    public PopulationParameters getParameters() {
+        return this.parameters;
     }
 
     private void calculateFitness() {
@@ -100,45 +101,35 @@ public class Population {
         return this.fitness;
     }
 
-    public int size() {
-        return population.size();
-    }
-
     public void crossoverPopulation() throws CrossoverException {
-        int individualIndex = 0;
-        PriorityQueue<Individual> nextGeneration = new PriorityQueue<>(
-                Comparator.comparingDouble(Individual::getFitness));
-        for (Individual parent1 : population) {
-            if (individualIndex > parameters.getElitismCount()) {
-                Individual parent2;
-                do {
-                    parent2 = selectionStrategy.select(this);
-                } while (parent1.equals(parent2));
+        List<Pair<Individual>> pairs = selectionStrategy.select(this);
+        List<Individual> newGeneration = new ArrayList<>(
+                population.subList(0, parameters.getElitismCount())
+        );
+        newGeneration.addAll(crossoverStrategy.apply(pairs));
 
-                Individual offspring = crossoverStrategy.apply(parent1, parent2);
-                nextGeneration.add(offspring);
-            } else {
-                nextGeneration.add(parent1);
-            }
-
-            individualIndex++;
-        }
-
-        population = nextGeneration;
+        population = newGeneration;
+        sortPopulation();
         calculateFitness();
     }
 
     public void mutatePopulation() {
-        int individualIndex = 0;
         for (Individual individual : population) {
-            if (individualIndex++ > parameters.getElitismCount()
-                    && Math.random() < parameters.getMutationRate()) {
+            if (Math.random() < parameters.getMutationRate()) {
                 individual.mutate();
+                System.out.println("mutate");
             }
         }
+        sortPopulation();
     }
 
     public Individual getFittestIndividual() {
-        return population.peek();
+        return population.get(0);
+    }
+
+    private void sortPopulation() {
+        this.population.sort(
+                Comparator.comparingDouble(Individual::getFitness)//.reversed()
+        );
     }
 }

@@ -1,6 +1,9 @@
 package ua.vlad.artificialintellijence.model.strategies.crossover;
 
+import ua.vlad.artificialintellijence.model.Pair;
 import ua.vlad.artificialintellijence.model.individual.Individual;
+
+import java.util.List;
 
 /**
  * Created by vlad on 13.03.17.
@@ -8,5 +11,5 @@ import ua.vlad.artificialintellijence.model.individual.Individual;
 @FunctionalInterface
 public interface CrossoverStrategy {
 
-    Individual apply(Individual i1, Individual i2) throws CrossoverException;
+    List<Individual> apply(List<Pair<Individual>> pairs) throws CrossoverException;
 }

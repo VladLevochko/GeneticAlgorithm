@@ -3,6 +3,8 @@ package ua.vlad.artificialintellijence.model.strategies.crossover;
 import org.junit.Test;
 import ua.vlad.artificialintellijence.model.gen.Gen;
 import ua.vlad.artificialintellijence.model.individual.Individual;
+import ua.vlad.artificialintellijence.model.strategies.mutation.MutationStrategy;
+import ua.vlad.artificialintellijence.model.strategies.mutation.TraversalSalesmanMutation;
 
 import java.util.*;
 
@@ -31,32 +33,33 @@ public class TwoPointOrderCrossoverTest {
         }
 
         chromosome2 = new ArrayList<>(chromosome1);
-//        Collections.copy(chromosome2, chromosome1);
         Collections.shuffle(chromosome2);
-//        for (int i = GENS_NUMBER - 1; i >= 0; i--) {
-//            chromosome2.add(new Gen(i));
-//        }
 
-        individual1 = new Individual(chromosome1, chromosome -> 0);
-        individual2 = new Individual(chromosome2, chromosome -> 0);
+
+        MutationStrategy mutation = new TraversalSalesmanMutation();
+        individual1 = new Individual(chromosome1, chromosome -> 0, mutation);
+        individual2 = new Individual(chromosome2, chromosome -> 0, mutation);
     }
 
     @Test
     public void testApply() {
+    }
+
+    @Test
+    public void testBuildNewChromosome() {
+        int cutPoint1 = 10;
+        int cutPoint2 = 80;
         for (int i = 0; i < TESTS_NUMBER; i++) {
-            Individual offspring = null;
-            try {
-                offspring = crossover.apply(individual1, individual2);
-            } catch (CrossoverException e) {
-                e.printStackTrace();
-            }
+            List<Gen> offspring1 = crossover.buildNewChromosome(cutPoint1, cutPoint2,
+                    chromosome1, chromosome2);
+            List<Gen> offspring2 = crossover.buildNewChromosome(cutPoint1, cutPoint2,
+                    chromosome2, chromosome1);
 
+            Set<Gen> gens1 = new HashSet<>(offspring1);
+            Set<Gen> gens2 = new HashSet<>(offspring2);
 
-            Set<Gen> gens = new HashSet<>();
-            List<Gen> offspringChromosome = offspring.getChromosome();
-            gens.addAll(offspringChromosome);
-
-            assertEquals(chromosome1.size(), gens.size());
+            assertEquals(GENS_NUMBER, gens1.size());
+            assertEquals(GENS_NUMBER, gens2.size());
         }
     }
 }

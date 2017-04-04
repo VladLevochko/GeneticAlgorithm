@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import ua.vlad.artificialintellijence.model.gen.Gen;
 import ua.vlad.artificialintellijence.model.strategies.fitness.TraversalSalesmanFitness;
+import ua.vlad.artificialintellijence.model.strategies.mutation.TraversalSalesmanMutation;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -37,7 +38,7 @@ public class IndividualTest {
                 .map(Gen::new)
                 .collect(Collectors.toList());
 
-        this.individual = new Individual(chromosome, l -> 0);
+        this.individual = new Individual(chromosome, l -> 0, new TraversalSalesmanMutation());
     }
 
     @Test

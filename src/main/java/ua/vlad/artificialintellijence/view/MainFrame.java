@@ -18,9 +18,11 @@ public class MainFrame extends JFrame implements View {
 
     private JPanel rootPanel;
     private JButton okButton;
-    private JSpinner spinner1;
+    private JSpinner generationsNumber;
     private JPanel drawPanel;
     private JButton clearButton;
+    private JSpinner populationNumber;
+    private JButton againButton;
 
 
     private List<Point> clickPositions;
@@ -32,10 +34,8 @@ public class MainFrame extends JFrame implements View {
         setVisible(true);
 
         this.clickPositions = new LinkedList<>();
-        this.spinner1.setValue(100);
-
-//        Graphics g = rootPanel.getGraphics();
-//        g.clearRect(0, 0, 500, 500);
+        this.generationsNumber.setValue(100);
+        this.populationNumber.setValue(100);
 
         rootPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -50,12 +50,26 @@ public class MainFrame extends JFrame implements View {
 
         okButton.addActionListener(event -> this.controller.processData(
                 getClickPositions(),
-                getGenerationsNumber()));
+                getGenerationsNumber(),
+                getPopulationSize()));
 
         clearButton.addActionListener(event -> {
             clearClickPositions();
             Graphics g = drawPanel.getGraphics();
             g.clearRect(0, 0, 500, 500);
+        });
+
+        againButton.addActionListener(event -> {
+            Graphics g = drawPanel.getGraphics();
+            g.clearRect(0, 0, 500, 500);
+            for (Point p : clickPositions) {
+                drawPoint(p);
+            }
+            controller.processData(
+                    getClickPositions(),
+                    getGenerationsNumber(),
+                    getPopulationSize()
+            );
         });
 
 
@@ -71,7 +85,11 @@ public class MainFrame extends JFrame implements View {
     }
 
     public int getGenerationsNumber() {
-        return (Integer) spinner1.getValue();
+        return (Integer) generationsNumber.getValue();
+    }
+
+    public int getPopulationSize() {
+        return (Integer) populationNumber.getValue();
     }
 
     @Override

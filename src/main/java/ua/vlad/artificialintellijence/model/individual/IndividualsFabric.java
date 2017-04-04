@@ -23,7 +23,10 @@ public class IndividualsFabric {
             Collections.shuffle(newChromosome);
 
             population.add(new Individual(
-                    newChromosome, initialIndividual.getFitnessFunction()));
+                    newChromosome,
+                    initialIndividual.getFitnessFunction(),
+                    initialIndividual.getMutationStrategy())
+            );
         }
 
         return population;

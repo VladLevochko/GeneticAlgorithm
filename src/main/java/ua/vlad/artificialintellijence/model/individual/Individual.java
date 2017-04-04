@@ -2,11 +2,9 @@ package ua.vlad.artificialintellijence.model.individual;
 
 import ua.vlad.artificialintellijence.model.gen.Gen;
 import ua.vlad.artificialintellijence.model.strategies.fitness.FitnessStrategy;
+import ua.vlad.artificialintellijence.model.strategies.mutation.MutationStrategy;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by vlad on 12.03.17.
@@ -15,12 +13,15 @@ public class Individual {
 
     private List<Gen> chromosome;
     private FitnessStrategy fitnessFunction;
+    private MutationStrategy mutationStrategy;
     private double fitness;
 
     public Individual(List<Gen> chromosome,
-                      FitnessStrategy fitnessFunction) {
+                      FitnessStrategy fitnessFunction,
+                      MutationStrategy mutationStrategy) {
         this.chromosome = chromosome;
         this.fitnessFunction = fitnessFunction;
+        this.mutationStrategy = mutationStrategy;
         calculateFitness();
     }
 
@@ -37,6 +38,10 @@ public class Individual {
         return fitnessFunction;
     }
 
+    public MutationStrategy getMutationStrategy() {
+        return mutationStrategy;
+    }
+
     private void calculateFitness() {
         this.fitness = fitnessFunction.calculate(chromosome);
     }
@@ -46,16 +51,11 @@ public class Individual {
     }
 
     public void mutate() {
-        int mutationPosition1 = (int) (Math.random() * chromosome.size());
-        int mutationPosition2 = (int) (Math.random() * chromosome.size());
-
-        Gen temporary = chromosome.get(mutationPosition1);
-        chromosome.set(mutationPosition1, chromosome.get(mutationPosition2));
-        chromosome.set(mutationPosition2, temporary);
+        mutationStrategy.mutate(this.chromosome);
     }
 
     public Individual copy() {
-        return new Individual(getChromosome(), fitnessFunction);
+        return new Individual(getChromosome(), fitnessFunction, mutationStrategy);
     }
 
     @Override
@@ -72,8 +72,6 @@ public class Individual {
         }
 
         return this.chromosome.containsAll(that.chromosome);
-
-//        return chromosome != null ? chromosome.equals(that.chromosome) : that.chromosome == null;
     }
 
     @Override
